@@ -1,3 +1,5 @@
+"""Core package - state management, caching, and flow control"""
+
 from .state_machine import InterviewFlow, StepState, FLOW_TRANSITIONS, DEPENDENCY_CHAIN
 from .session_manager import SessionStateManager
 from .cache_manager import LayeredCache, cache, cached_analysis

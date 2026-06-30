@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Literal, Optional
+from typing import Literal, Optional, Dict, Any
 
 
 class PersonalInfo(BaseModel):
@@ -82,3 +82,39 @@ class ResumeDocument(BaseModel):
     missing_fields: list[str] = Field(description="待补充字段")
     suggestions: list[str] = Field(description="改进建议，最多5条")
     raw_text: Optional[str] = Field(description="Markdown格式完整简历")
+
+
+class OptimizationType(BaseModel):
+    """优化类型"""
+    category: Literal["结构调整", "内容强化", "关键词植入", "量化改进", "格式优化"] = Field(description="优化类别")
+    description: str = Field(description="优化说明")
+    before: Optional[str] = Field(description="优化前内容")
+    after: str = Field(description="优化后内容")
+    reason: str = Field(description="优化原因")
+
+
+class JDAlignment(BaseModel):
+    """JD对齐分析"""
+    jd_requirement: str = Field(description="JD中的要求")
+    resume_match: str = Field(description="简历中的匹配点")
+    alignment_strength: Literal["强匹配", "弱匹配", "无匹配"] = Field(description="匹配强度")
+    suggestion: Optional[str] = Field(description="优化建议")
+
+
+class OptimizationNotes(BaseModel):
+    """优化说明"""
+    optimization_types: list[OptimizationType] = Field(description="各类优化，最多10条")
+    jd_alignments: list[JDAlignment] = Field(description="JD对齐分析，最多10条")
+    keywords_added: list[str] = Field(description="植入的关键词")
+    quantified_improvements: list[str] = Field(description="量化改进点")
+    overall_score_before: int = Field(description="优化前评分（1-10）")
+    overall_score_after: int = Field(description="优化后评分（1-10）")
+    improvement_summary: str = Field(description="整体改进摘要")
+    user_review_needed: list[str] = Field(description="需用户审核的改动")
+    authenticity_check: list[str] = Field(description="真实性校验提醒")
+
+
+class OptimizedResume(BaseModel):
+    """优化后的简历及说明"""
+    resume: ResumeDocument
+    optimization_notes: OptimizationNotes
