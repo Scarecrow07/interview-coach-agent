@@ -1,0 +1,12 @@
+langchain==0.3.0
+langchain-openai==0.2.0
+langchain-core==0.3.0
+openai==1.40.0
+pydantic==2.8.0
+pydantic-settings==2.3.0
+streamlit==1.35.0
+fastapi==0.110.0
+uvicorn==0.30.0
+redis==5.0.0
+python-dotenv==1.0.0
+plotly==5.20.0
