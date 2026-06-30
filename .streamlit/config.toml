@@ -1,0 +1,17 @@
+[general]
+projectName = "interview-coach-agent"
+
+[server]
+port = 8501
+enableCORS = false
+enableXsrfProtection = false
+headless = true
+
+[runner]
+magicEnabled = true
+installTracer = false
+fixMatplotlib = false
+
+[client]
+showErrorDetails = true
+toolbarMode = "minimal"

@@ -1,0 +1,13 @@
+# Packages required for Streamlit Cloud
+# This file is used by Streamlit Cloud to install dependencies
+
+langchain
+langchain-openai
+langchain-core
+openai
+pydantic
+pydantic-settings
+streamlit
+python-dotenv
+redis
+plotly

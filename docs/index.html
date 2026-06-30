@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试作战指挥官 - 智能面试准备 Agent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        header {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .btn-primary {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #fff;
+            color: #764ba2;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .btn-secondary {
+            display: inline-block;
+            padding: 12px 30px;
+            background: transparent;
+            color: #fff;
+            text-decoration: none;
+            border: 2px solid #fff;
+            border-radius: 30px;
+            font-weight: 500;
+            margin-left: 15px;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background: #fff;
+            color: #764ba2;
+        }
+        
+        /* Features */
+        .features {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+        }
+        
+        .features h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 40px;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+        
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .feature-card p {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        /* Tech Stack */
+        .tech-stack {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .tech-stack h2 {
+            font-size: 32px;
+            margin-bottom: 30px;
+        }
+        
+        .tech-icons {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .tech-item {
+            text-align: center;
+        }
+        
+        .tech-item i {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+        
+        .tech-item span {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* Flow */
+        .flow {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+        }
+        
+        .flow h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 40px;
+        }
+        
+        .flow-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .flow-step {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: #ffd700;
+            color: #764ba2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+        
+        .step-title {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .step-desc {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .flow-arrow {
+            color: #ffd700;
+            font-size: 30px;
+        }
+        
+        /* Demo */
+        .demo {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .demo h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .demo-video {
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            padding: 40px;
+            margin: 30px auto;
+            max-width: 800px;
+        }
+        
+        .demo-placeholder {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 60px;
+        }
+        
+        .demo-placeholder i {
+            font-size: 60px;
+            opacity: 0.5;
+        }
+        
+        /* GitHub Link */
+        .github-section {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            background: #24292e;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        
+        .github-link:hover {
+            background: #1a1e22;
+            transform: translateY(-2px);
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px;
+            opacity: 0.7;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+            
+            .subtitle {
+                font-size: 16px;
+            }
+            
+            .flow-steps {
+                flex-direction: column;
+            }
+            
+            .flow-arrow {
+                display: none;
+            }
+            
+            .btn-primary, .btn-secondary {
+                margin: 10px 0;
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">🎯</div>
+            <h1>面试作战指挥官</h1>
+            <p class="subtitle">基于 LangChain + DeepSeek V4 的智能面试准备全流程助手</p>
+            <a href="https://scarecrow07-interview-coach-agent.streamlit.app" class="btn-primary">
+                <i class="fas fa-play"></i> 立即使用
+            </a>
+            <a href="https://github.com/Scarecrow07/interview-coach-agent" class="btn-secondary">
+                <i class="fab fa-github"></i> GitHub
+            </a>
+        </header>
+        
+        <!-- Features -->
+        <section class="features">
+            <h2>核心功能</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>简历准备</h3>
+                    <p>上传已有简历或填写背景创建结构化简历，自动解析为标准格式</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✨</div>
+                    <h3>简历优化</h3>
+                    <p>针对性优化简历，植入JD关键词，量化成果，生成优化说明</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <h3>JD分析</h3>
+                    <p>深度分析职位描述，提炼核心职责、硬性要求、隐藏信息和高频问题</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>简历分析</h3>
+                    <p>结合JD进行针对性分析，挖掘STAR-L成就事件和核心优势</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>匹配度分析</h3>
+                    <p>量化评估候选人能力与JD的匹配程度，提供差距弥补方案</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>面试方案</h3>
+                    <p>生成定制化自我介绍、项目介绍和15题问答库（含完整回答示例）</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>笔试题目</h3>
+                    <p>基于JD生成针对性笔试题，覆盖核心技术要求</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>最终手册</h3>
+                    <p>整合所有报告生成完整面试作战手册，支持Markdown下载</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Flow -->
+        <section class="flow">
+            <h2>使用流程</h2>
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-title">简历准备</div>
+                    <div class="step-desc">上传/创建简历</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-title">JD分析</div>
+                    <div class="step-desc">输入职位描述</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-title">简历分析</div>
+                    <div class="step-desc">结合JD分析</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-number">4</div>
+                    <div class="step-title">匹配度</div>
+                    <div class="step-desc">量化评估</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-number">5</div>
+                    <div class="step-title">面试方案</div>
+                    <div class="step-desc">问答库生成</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-number">6</div>
+                    <div class="step-title">最终手册</div>
+                    <div class="step-desc">下载打印</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Tech Stack -->
+        <section class="tech-stack">
+            <h2>技术栈</h2>
+            <div class="tech-icons">
+                <div class="tech-item">
+                    <i class="fab fa-python" style="color: #3776ab;"></i>
+                    <span>Python 3.10+</span>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-brain" style="color: #ffd700;"></i>
+                    <span>LangChain 0.3</span>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-robot" style="color: #ff6b6b;"></i>
+                    <span>DeepSeek V4</span>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-desktop" style="color: #ff4b4b;"></i>
+                    <span>Streamlit</span>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-check-circle" style="color: #4b8bbe;"></i>
+                    <span>Pydantic</span>
+                </div>
+                <div class="tech-item">
+                    <i class="fas fa-database" style="color: #a0a0a0;"></i>
+                    <span>SQLite</span>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Demo -->
+        <section class="demo">
+            <h2>在线体验</h2>
+            <p>点击下方按钮启动应用，体验完整的面试准备流程</p>
+            <div class="demo-video">
+                <div class="demo-placeholder">
+                    <i class="fas fa-play-circle"></i>
+                    <p style="margin-top: 20px;">Streamlit Cloud 应用</p>
+                </div>
+            </div>
+            <a href="https://scarecrow07-interview-coach-agent.streamlit.app" class="btn-primary">
+                <i class="fas fa-external-link-alt"></i> 打开在线应用
+            </a>
+        </section>
+        
+        <!-- GitHub -->
+        <section class="github-section">
+            <h2>开源代码</h2>
+            <p style="margin-bottom: 20px;">完整源码托管在 GitHub，欢迎 Star 和 Fork</p>
+            <a href="https://github.com/Scarecrow07/interview-coach-agent" class="github-link">
+                <i class="fab fa-github" style="font-size: 24px;"></i>
+                <span>GitHub Repository</span>
+            </a>
+        </section>
+        
+        <!-- Footer -->
+        <footer>
+            <p>MIT License | Powered by DeepSeek V4 & LangChain</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/Scarecrow07" style="color: #fff;">@Scarecrow07</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
