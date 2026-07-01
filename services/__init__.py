@@ -7,6 +7,7 @@ from .jd_service import analyze_jd
 from .resume_analysis_service import analyze_resume
 from .match_service import analyze_match
 from .interview_service import InterviewEngine, interview_engine, generate_written_test
+from .pdf_service import generate_resume_pdf, generate_resume_pdf_to_file
 
 __all__ = [
     "get_llm", "llm",
@@ -14,4 +15,5 @@ __all__ = [
     "create_resume_from_background", "parse_resume_to_structured", "optimize_resume",
     "analyze_jd", "analyze_resume", "analyze_match",
     "InterviewEngine", "interview_engine", "generate_written_test",
+    "generate_resume_pdf", "generate_resume_pdf_to_file",
 ]

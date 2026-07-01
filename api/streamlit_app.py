@@ -23,7 +23,8 @@ from core import (
 from services import (
     create_resume_from_background, parse_resume_to_structured, optimize_resume,
     analyze_jd, analyze_resume, analyze_match,
-    interview_engine, generate_written_test
+    interview_engine, generate_written_test,
+    generate_resume_pdf,
 )
 
 # 全局实例
@@ -193,6 +194,177 @@ def render_resume_display(state: dict):
         if resume.raw_text:
             with st.expander("查看完整简历 (Markdown)"):
                 st.markdown(resume.raw_text)
+
+        # PDF 导出
+        st.markdown("---")
+        st.markdown("#### 📥 导出简历 PDF")
+        col_pdf, col_info = st.columns([1, 2])
+        with col_pdf:
+            try:
+                pdf_bytes = generate_resume_pdf(resume)
+                st.download_button(
+                    label="下载简历 PDF",
+                    data=pdf_bytes,
+                    file_name=f"{resume.personal_info.name}_简历.pdf",
+                    mime="application/pdf",
+                    type="primary",
+                )
+            except Exception as e:
+                st.error(f"PDF 生成失败: {e}")
+        with col_info:
+            st.caption("PDF 包含专业排版：姓名页眉、个人总结、工作经历（含 STAR-L）、项目经历、教育背景、技能表格")
+
+
+def render_resume_optimize(session_id: str, state: dict):
+    """渲染简历优化界面"""
+    st.markdown("### ✨ 简历优化")
+    
+    resume = state["analysis_results"].get("resume")
+    jd_text = state["user_data"].get("jd", "")
+    jd_report = state["analysis_results"].get("jd_report")
+    
+    if not resume:
+        st.info("请先准备简历后再进行优化")
+        return
+    
+    # 显示当前简历评分提示
+    st.markdown("当前简历已就绪，可针对 JD 进行定向优化。")
+    
+    # 优化选项
+    col1, col2 = st.columns(2)
+    with col1:
+        use_jd = st.checkbox("结合 JD 进行定向优化", value=bool(jd_text or jd_report))
+    with col2:
+        extra_instructions = st.text_input(
+            "额外优化要求（可选）",
+            placeholder="例如：突出项目管理经验、弱化短期经历..."
+        )
+    
+    if st.button("优化简历", type="primary"):
+        with st.spinner("优化中...（LLM 分析 + 结构化输出）"):
+            try:
+                optimized = optimize_resume(
+                    current_resume=resume,
+                    job_description=jd_text if use_jd else None,
+                    jd_report=jd_report.model_dump() if (use_jd and jd_report) else None,
+                )
+                session_manager.save_result(session_id, "optimized_resume", optimized)
+                st.success("简历优化完成！")
+                st.rerun()
+            except Exception as e:
+                st.error(f"优化失败: {e}")
+    
+    # 显示优化结果
+    optimized_resume = state["analysis_results"].get("optimized_resume")
+    if optimized_resume:
+        st.markdown("---")
+        st.markdown("### 📄 优化后的简历")
+        
+        opt_resume = optimized_resume.resume
+        notes = optimized_resume.optimization_notes
+        
+        # 评分对比
+        col_before, col_after, col_delta = st.columns(3)
+        with col_before:
+            st.metric("优化前评分", f"{notes.overall_score_before}/10")
+        with col_after:
+            st.metric("优化后评分", f"{notes.overall_score_after}/10")
+        with col_delta:
+            delta = notes.overall_score_after - notes.overall_score_before
+            st.metric("提升", f"+{delta}" if delta > 0 else str(delta))
+        
+        # 优化摘要
+        with st.expander("优化摘要", expanded=True):
+            st.markdown(notes.improvement_summary)
+            
+            if notes.keywords_added:
+                st.markdown("**植入关键词:**")
+                st.markdown("  ".join(f"`{k}`" for k in notes.keywords_added))
+            
+            if notes.quantified_improvements:
+                st.markdown("**量化改进:**")
+                for q in notes.quantified_improvements:
+                    st.markdown(f"- {q}")
+        
+        # 优化明细
+        if notes.optimization_types:
+            with st.expander("优化明细"):
+                for opt in notes.optimization_types:
+                    st.markdown(f"**[{opt.category}]** {opt.description}")
+                    if opt.before:
+                        st.markdown(f"  - 优化前: {opt.before}")
+                    st.markdown(f"  - 优化后: {opt.after}")
+                    st.markdown(f"  - 原因: {opt.reason}")
+                    st.markdown("")
+        
+        # JD 对齐
+        if notes.jd_alignments:
+            with st.expander("JD 对齐分析"):
+                for align in notes.jd_alignments:
+                    status_icon = {
+                        "强匹配": "🟢",
+                        "弱匹配": "🟡",
+                        "无匹配": "🔴",
+                    }.get(align.alignment_strength, "⚪")
+                    st.markdown(f"{status_icon} **[{align.alignment_strength}]** {align.jd_requirement}")
+                    st.markdown(f"  - 匹配点: {align.resume_match}")
+                    if align.suggestion:
+                        st.markdown(f"  - 建议: {align.suggestion}")
+        
+        # 真实性校验
+        if notes.authenticity_check:
+            with st.expander("真实性校验提醒"):
+                st.warning("请审核以下改动，确保信息真实：")
+                for check in notes.authenticity_check:
+                    st.markdown(f"- {check}")
+        
+        # 优化后简历详情
+        with st.expander("查看优化后完整简历"):
+            st.markdown(f"**姓名**: {opt_resume.personal_info.name}")
+            st.markdown(f"**核心身份**: {opt_resume.summary.core_identity}")
+            
+            st.markdown("**工作经历**:")
+            for exp in opt_resume.work_experiences:
+                st.markdown(f"- **{exp.company}** - {exp.position}")
+                for r in exp.responsibilities[:3]:
+                    st.markdown(f"  - {r}")
+            
+            st.markdown("**项目经历**:")
+            for proj in opt_resume.project_experiences[:3]:
+                st.markdown(f"- **{proj.project_name}** ({proj.role})")
+        
+        # PDF 导出（优化后简历）
+        st.markdown("---")
+        st.markdown("#### 📥 导出优化后简历")
+        col_pdf1, col_pdf2, col_info = st.columns([1, 1, 2])
+        
+        with col_pdf1:
+            try:
+                pdf_bytes_opt = generate_resume_pdf(opt_resume, include_optimization_notes=False)
+                st.download_button(
+                    label="下载简历 PDF（仅简历）",
+                    data=pdf_bytes_opt,
+                    file_name=f"{opt_resume.personal_info.name}_优化简历.pdf",
+                    mime="application/pdf",
+                    type="primary",
+                )
+            except Exception as e:
+                st.error(f"PDF 生成失败: {e}")
+        
+        with col_pdf2:
+            try:
+                pdf_bytes_full = generate_resume_pdf(optimized_resume, include_optimization_notes=True)
+                st.download_button(
+                    label="下载完整 PDF（简历+优化说明）",
+                    data=pdf_bytes_full,
+                    file_name=f"{opt_resume.personal_info.name}_优化简历_含说明.pdf",
+                    mime="application/pdf",
+                )
+            except Exception as e:
+                st.error(f"PDF 生成失败: {e}")
+        
+        with col_info:
+            st.caption("可下载纯简历版或含优化说明的完整版 PDF")
 
 
 def render_jd_input(session_id: str, state: dict):
@@ -565,6 +737,7 @@ def main():
     # 创建标签页
     tabs = st.tabs([
         "简历准备",
+        "简历优化",
         "JD分析",
         "简历分析",
         "匹配度",
@@ -578,7 +751,7 @@ def main():
         if resume:
             render_resume_display(state)
             
-            # 优化简历选项
+            # 操作按钮
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("重新准备简历"):
@@ -587,7 +760,10 @@ def main():
         else:
             render_resume_prep(session_id, state)
     
-    with tabs[1]:  # JD分析
+    with tabs[1]:  # 简历优化
+        render_resume_optimize(session_id, state)
+    
+    with tabs[2]:  # JD分析
         jd_report = state["analysis_results"].get("jd_report")
         if jd_report:
             render_jd_display(state)
@@ -597,7 +773,7 @@ def main():
         else:
             render_jd_input(session_id, state)
     
-    with tabs[2]:  # 简历分析
+    with tabs[3]:  # 简历分析
         resume_report = state["analysis_results"].get("resume_report")
         if resume_report:
             render_resume_analysis_display(state)
@@ -606,7 +782,7 @@ def main():
         else:
             render_resume_analysis(session_id, state)
     
-    with tabs[3]:  # 匹配度
+    with tabs[4]:  # 匹配度
         match_report = state["analysis_results"].get("match_report")
         if match_report:
             render_match_display(state)
@@ -615,7 +791,7 @@ def main():
         else:
             render_match_analysis(session_id, state)
     
-    with tabs[4]:  # 面试方案
+    with tabs[5]:  # 面试方案
         interview_plan = state["analysis_results"].get("interview_plan")
         if interview_plan:
             render_interview_plan_display(state)
@@ -624,10 +800,10 @@ def main():
         else:
             render_interview_plan(session_id, state)
     
-    with tabs[5]:  # 笔试题目
+    with tabs[6]:  # 笔试题目
         render_written_test(session_id, state)
     
-    with tabs[6]:  # 最终手册
+    with tabs[7]:  # 最终手册
         render_final_manual(state)
 
 
